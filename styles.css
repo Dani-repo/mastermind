@@ -1,0 +1,296 @@
+#game-area {
+   min-height: 65vh;
+   display: block;
+   /* border: 1px solid #ccc; */
+   /* margin-bottom: 20px; */
+   /* background-color: #f9f9f9; */
+}
+
+/* -------------------- */
+/* Controls Section     */
+
+#howto-section {
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   border: 2px solid #000f;
+   row-gap: 20px;
+   background-color: #f2efef;
+   border-radius: 8px;
+}
+
+#control-section {
+   display: flex;
+   flex-direction: column;
+   height: auto;
+   margin-top: 16px;
+   border: 2px solid #000;
+   row-gap: 8px;
+   background-color: #f2efef;
+   border-radius: 8px;
+}
+
+.symbol-type-radio {
+   /* border: 1px solid #000; */
+   margin-left: 4px;
+}
+
+/* .difficulty-slider{
+   border: 3px solid #000;
+} */
+.pool-section {
+   grid-column: full-start;
+   margin-top: 10px;
+
+   /* this to set the grids/columns to use the whole width */
+}
+
+.pool-main-body {
+   display: grid;
+   grid-template-columns: 60% 40%;
+   column-gap: 0.rem;
+   justify-items: start;
+   /* border: solid 1px #1dbb3f; */
+
+}
+
+.pool-group {
+   display: flex;
+   flex-wrap: wrap;
+   width: auto;
+   height: 100%;
+   /* border: solid 1px #cb0b82; */
+}
+
+.pool-item {
+   width: 40px;
+   height: 40px;
+   border: 1px solid #000;
+   border-radius: 8px;
+   display: inline-flex;
+   flex-direction: column;
+   margin: 2px;
+   background-color: #c4d5d7;
+}
+
+.pool-buttons {
+   display: block;
+   width: fit-content;
+   height: auto;
+   grid-template-rows: 100% 100%;
+   row-gap: 20px;
+}
+
+
+.pool-item,
+.selected-item {
+   transition: all 0.2s ease;
+}
+
+.pool-item:hover,
+.selected-item:hover {
+   transform: scale(1.50);
+}
+
+#pool-btn-0,
+#pool-btn-1,
+#pool-btn-2,
+#pool-btn-3,
+#pool-btn-4,
+#pool-btn-5,
+#pool-btn-6,
+#pool-btn-7,
+#pool-btn-8,
+#pool-btn-9,
+#selected-btn-0,
+#selected-btn-1,
+#selected-btn-2,
+#selected-btn-3,
+#selected-btn-4,
+#selected-btn-5,
+#selected-btn-6,
+#selected-btn-7,
+#selected-btn-8,
+#selected-btn-9 {
+   width: 100%;
+   height: 100%;
+   display: flex;
+   /* Ensures it acts as a block element */
+   box-sizing: border-box;
+   /* Includes padding/border in 100% width */
+   justify-content: center;
+   /* Centers horizontally */
+   align-items: center;
+   /* Centers vertically */
+}
+
+
+/* --------------------------------------- */
+/* Play Section Score and Selected Palette */
+#score-selected-section {
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   border: 2px solid #000;
+   background-color: #f2efef;
+   row-gap: 10px;
+}
+
+.play-button {
+   margin-top: 260px;
+}
+
+/* Ensure all main game columns have similar vertical size */
+#guess-section,
+#result-section,
+#attempts-section {
+   border: 2px solid #000;
+   background-color: #f2efef;
+}
+
+#game-status {
+   min-height: 3.5rem;
+}
+
+#game-message,
+#secret-code-label,
+#secret-code-display {
+   margin-bottom: 0;
+}
+
+.selected-section {
+   grid-column: full-start;
+   margin-top: auto;
+   /* margin-top: 140px; */
+
+}
+
+.selected-main-body {
+   display: grid;
+   grid-template-columns: 70% 20%;
+   column-gap: 0.rem;
+   justify-items: start;
+}
+
+.selected-group {
+   display: flex;
+   flex-wrap: wrap;
+   width: auto;
+   height: 100%;
+}
+
+.selected-item {
+   width: 40px;
+   height: 40px;
+   border: 1px solid #000;
+   border-radius: 8px;
+   display: inline-flex;
+   flex-direction: column;
+   margin: 2px;
+   background-color: #9ee4b2;
+}
+
+.selected-buttons {
+   display: block;
+   grid-template-rows: 100% 100%;
+   row-gap: 20px;
+}
+
+.selected-item {
+   padding: 0;
+   /* Remove cell padding to allow button to fill space */
+}
+
+
+/* -------------------------- */
+
+#guess-section,
+#result-section,
+#attempts-section {
+   height: fit-content;
+   width: fit-content;
+}
+
+/* -------------------- */
+
+.guess-table {
+   width: auto;
+   /* border: solid 1px #c310b1; */
+}
+
+/* Remove extra bottom margin from the Bootstrap results table so guess and result sections match in height */
+#result-section .table {
+   margin-bottom: 0;
+}
+
+#game-area>.d-flex {
+   justify-content: center;
+}
+
+.guess-item {
+   width: 48px;
+   height: 48px;
+   border: 1px solid #000;
+   border-radius: 8px;
+   display: inline-block;
+   /* flex-direction: column; */
+   margin: 3px;
+   text-align: center;
+   margin-top: 6px;
+   background-color: #f0f4f1;
+   font-size: 2rem;
+}
+
+/* ----------------------- */
+
+.results {
+   width: 48px;
+   height: 48px;
+   border: 1px solid #000;
+   border-radius: 8px;
+   display: inline-block;
+   margin: 3px;
+   text-align: center;
+   margin-top: 6px;
+}
+
+.results-green {
+   color: #2507bc !important;
+   /* keep tick color (magenta/purple) */
+   background-color: #198754 !important;
+   /* strong green background */
+   font-weight: bolder;
+   font-size: 1rem;
+}
+
+.results-orange {
+   color: #da0820 !important;
+   /* keep tick color (red/magenta) */
+   background-color: #fd7e14 !important;
+   /* orange background */
+   font-weight: bolder;
+   font-size: 1rem;
+}
+
+.attempt {
+   width: 48px;
+   height: 48px;
+   border: 1px solid #000;
+   border-radius: 8px;
+   margin: 3px;
+   text-align: center;
+   margin-top: 6px;
+}
+
+.attempt-item {
+   width: 48px;
+   height: 48px;
+   /* border: 1px solid #000; */
+   border-radius: 8px;
+    /* flex-direction: column; */
+   margin: 9px;
+   text-align: center;
+   /* margin-top: 6px; */
+   background-color: #f0f4f1;
+   font-size: 1.25rem;
+}

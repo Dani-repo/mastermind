@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Mastermind</title>
+
+    <!-- Bootstrap CSS (CDN) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="icon" href="favicon.ico">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body class="container py-4">
+    <h1 class="text-center">Mastermind Game</h1>
+
+    <section id="game-area" class="game-area mt-5">
+        <div class="d-flex row-cols-4 gap-4 flex-row">
+            <!-- ****************************************************** -->
+            <!---------------- HOW TO / CONTROLS SECTION ----------------->
+            <!-- ****************************************************** -->
+            <div id="howto-control-section" class="col col-lg-4 rounded-2 w-100% h-100">
+
+                <!---------------- HOW TO ----------------->
+                <div id="howto-section" class="row ">
+                    <h3 class="text-center fs-">How to play</h3>
+                    <p class="ms-2">
+                        1. Choose the symbol type: Numbers, Animals or Shapes<br>
+                        2. Choose the difficulty level slider<br>
+                        3. Pick the symbols from the palette pool or click auto pick<br>
+                        4. Click START GAME<br>
+                        5. Select and submit your guess<br>
+                    Results:
+                    <br> <span class="results-green">✔</span> : correct symbol in the correct position (earns 2 pts)
+                    <br> <span class="results-orange">✔</span> : correct symbol in the correct position (earns 0 pt)
+                        </p>
+                </div>
+
+                <!---------------- CONTROL-SECTION ----------------->
+                <div id="control-section" class="row">
+                    <h3 class="text-center fs-4">Controls</h3>
+
+                    <!-- 1. Radio Buttons for type of game -->
+                    <div class="row symbol-type-radio">
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="typeRadio" id="numberType"
+                                value="Numbers" checked>
+                            <label class="form-check-label" for="numberType">Numbers (Easiest)</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="typeRadio" id="colourType"
+                                value="Animals">
+                            <label class="form-check-label" for="colourType">Animals</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input" type="radio" name="typeRadio" id="shapeType" value="Shapes">
+                            <label class="form-check-label" for="shapeType">Shapes (Hardest)</label>
+                        </div>
+                    </div>
+
+                    <!-- 2. Slider for difficulty level -->
+                    <div class="row difficulty-slider ms-1 w-75%">Beginner --------------- Intermediate ----------------- Expert
+                        <input type="range" class="form-range bg-dark-subtle" id="difficultySlider" min="5" max="10" value="5">
+                    </div>
+
+                    <!---------------- SYMBOLS POOL ----------------->
+                    <!-- 3. pick the items from the selection palette to play palette or click auto pick -->
+                    <section class="row pool-section">
+                        <h4 class="justify-content-evenly">Symbols Pool</h4>
+
+                        <div class="pool-main-body row-cols-lg-2">
+                            <div class="col pool-group">
+                                <table id="pool-table">
+                                    <tbody>
+                                        <!-- DOM elements to be injected by JavaScript -->
+                                        <!-- 
+                                        <tr>                                   
+                                            <td class="pool-item"></td>
+                                            ...
+                                            ...
+                                            <td class="pool-item"></td>
+                                        </tr> 
+                                        -->
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="col pool-buttons ">
+                                <div>
+                                    <button id="remove-all-btn" class="btn btn-warning my-1">
+                                        ◀︎ Remove All ↤
+                                    </button>
+                                    <button id="quick-pick-btn" class="btn btn-success">
+                                        ➜ Quick Pick ▶︎
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- ***************************************** -->
+            <!---------------- PLAY SECTION ----------------->
+            <!-- ***************************************** -->
+            <div id="score-selected-section" class="col col-sm-3 rounded-2 w-100%">
+
+                <!---------------- SCORE ----------------->
+                <div id="score" class="row text-center fs-4 me-4">
+                    <h4>Your Score</h4>
+                    <p id="score-value" class="fs-2">0</p>
+                    <div id="game-status" class="mt-2">
+                        <p id="game-message" class="mb-1"></p>
+                        <p id="secret-code-label" class="mb-0"></p>
+                        <p id="secret-code-display" class="mb-0"></p>
+                    </div>
+                </div>
+
+                <!----------------PLAY BUTTON ----------------->
+                <div class="play-button text-center">
+                    <div class="">
+                        <button id="play-btn" class="btn btn-success my-1">
+                            Start Game
+                        </button>
+                    </div>
+                </div>
+
+                <!----------------SELECTED SYMBOLS  ----------------->
+                <section class="row selected-section align-bottom ">
+                    <h4 class="justify-content-evenly ms-1">Selected Symbols</h4>
+
+                    <div class="selected-main-body">
+
+                        <div class="selected-group">
+                            <table id="selected-table">
+                                <tbody>
+                                    <!-- DOM elements for symbols are injected by JavaScript here -->
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="selected-buttons ">
+                            <div class="">
+                                <button id="undo-guess-btn" class="btn btn-warning my-1">
+                                    Undo ↺
+                                </button>
+                                <button id="submit-guess-btn" class="btn btn-success">
+                                    Submit▶︎
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- ******************************************** -->
+            <!---------------- GUESSES SECTION ----------------->
+            <!-- ******************************************** -->
+            <div id="guess-section" class="col col-md-4 rounded-2">
+                <h3 class="text-center fs-4">Your guesses</h3>
+                <table class="guess-table">
+                    <tbody>
+                        <tr id="guess-10">
+                            <td id="guess-100" class="guess-item"></td>
+                            <td id="guess-101" class="guess-item"></td>
+                            <td id="guess-102" class="guess-item"></td>
+                            <td id="guess-103" class="guess-item"></td>
+                            <td id="guess-104" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-9">
+                            <td id="guess-90" class="guess-item"></td>
+                            <td id="guess-91" class="guess-item"></td>
+                            <td id="guess-92" class="guess-item"></td>
+                            <td id="guess-93" class="guess-item"></td>
+                            <td id="guess-94" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-8">
+                            <td id="guess-80" class="guess-item"></td>
+                            <td id="guess-81" class="guess-item"></td>
+                            <td id="guess-82" class="guess-item"></td>
+                            <td id="guess-83" class="guess-item"></td>
+                            <td id="guess-84" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-7">
+                            <td id="guess-70" class="guess-item"></td>
+                            <td id="guess-71" class="guess-item"></td>
+                            <td id="guess-72" class="guess-item"></td>
+                            <td id="guess-73" class="guess-item"></td>
+                            <td id="guess-74" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-6">
+                            <td id="guess-60" class="guess-item"></td>
+                            <td id="guess-61" class="guess-item"></td>
+                            <td id="guess-62" class="guess-item"></td>
+                            <td id="guess-63" class="guess-item"></td>
+                            <td id="guess-64" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-5">
+                            <td id="guess-50" class="guess-item"></td>
+                            <td id="guess-51" class="guess-item"></td>
+                            <td id="guess-52" class="guess-item"></td>
+                            <td id="guess-53" class="guess-item"></td>
+                            <td id="guess-54" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-4">
+                            <td id="guess-40" class="guess-item"></td>
+                            <td id="guess-41" class="guess-item"></td>
+                            <td id="guess-42" class="guess-item"></td>
+                            <td id="guess-43" class="guess-item"></td>
+                            <td id="guess-44" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-3">
+                            <td id="guess-30" class="guess-item"></td>
+                            <td id="guess-31" class="guess-item"></td>
+                            <td id="guess-32" class="guess-item"></td>
+                            <td id="guess-33" class="guess-item"></td>
+                            <td id="guess-34" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-2">
+                            <td id="guess-20" class="guess-item"></td>
+                            <td id="guess-21" class="guess-item"></td>
+                            <td id="guess-22" class="guess-item"></td>
+                            <td id="guess-23" class="guess-item"></td>
+                            <td id="guess-24" class="guess-item"></td>
+                        </tr>
+                        <tr id="guess-1">
+                            <td id="guess-10" class="guess-item"></td>
+                            <td id="guess-11" class="guess-item"></td>
+                            <td id="guess-12" class="guess-item"></td>
+                            <td id="guess-13" class="guess-item"></td>
+                            <td id="guess-14" class="guess-item"></td>
+                        </tr>
+
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ******************************************** -->
+            <!---------------- RESULTS SECTION ----------------->
+            <!-- ******************************************** -->
+            <div id="result-section" class="col col-md-4 rounded-2">
+                <h3 class="text-center fs-4">Results</h3>
+                <table class="table">
+                    <tbody>
+                        <tr id="result-10">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-9">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-8">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-7">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-6">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-5">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-4">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-3">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-2">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        <tr id="result-1">
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                            <td class="results"></td>
+                        </tr>
+                        </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- ****************************************************** -->
+            <!---------------- NUMBER OF ATTEMPS SECTION ----------------->
+            <!-- ****************************************************** -->
+            <div id="attempts-section" class="col col-sm-1 rounded-2  ">
+                <h3 class="text-center">#</h3>
+                <div class="text text-center fs-4">
+                    <p class="attempt-item">10</p>
+                    <p class="attempt-item">9</p>
+                    <p class="attempt-item">8</p>
+                    <p class="attempt-item">7</p>
+                    <p class="attempt-item">6</p>
+                    <p class="attempt-item">5</p>
+                    <p class="attempt-item">4</p>
+                    <p class="attempt-item">3</p>
+                    <p class="attempt-item">2</p>
+                    <p class="attempt-item">1</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!---------------- MESSAGE AREA ----------------->
+    <section id="message-area" class="message-area mt-4">
+        <div class="alert alert-info text-center" role="alert">
+            Created with HTML/CSS/Bootstrap and JavaScript, without the use of generative AI tools (GPT)
+            <br>AI Mode Google search was used for troubleshooting purposes.
+        </div>
+
+
+        <script src="script.js"></script>
+</body>
+
+</html>
