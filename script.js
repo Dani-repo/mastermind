@@ -1,5 +1,4 @@
-// Define symbol sets
-// ids are used for comparisons, results checking.
+// Define the available symbol sets for the game
 const numberSet = [
     { id: 'zero', symbol: '0' },
     { id: 'one', symbol: '1' },
@@ -34,22 +33,28 @@ const thingSet = [
     { id: 'yinyang', symbol: '☯︎' },
     { id: 'scale', symbol: '⚖︎' }];
 
-
-
+// symbols array to store the currently active symbol set (numbers / animals / shapes).
 let symbols = [numberSet.length]; // default symbol type is Numbers
-let selectedSymbols = []; //for the set of symbols to play
-let guessedSymbols = [];  // set of symbols submitted as guess
+// selectedSymbols array to store the palette chosen by the player from the active set
+let selectedSymbols = []; // for the set of symbols to play
+// guessedSymbols array to store the current in-progress guess for the active attempt.
+let guessedSymbols = [];  // set of symbols submitted as guess by player
 let numberofGuessSymbols = 0; 
+// answer array to store the last submitted guess (snapshot of guessedSymbols).
 let answer = []; 
-const MIN_SELECTED_SYMBOLS = 5;
-const CODE_LENGTH = 5;
-const MAX_ATTEMPTS = 10;
+// Game configuration constants.
+const MIN_SELECTED_SYMBOLS = 5; // minimum palette size required to start a game
+const CODE_LENGTH = 5;          // number of symbols in the secret code / each guess
+const MAX_ATTEMPTS = 10;        // max number of guesses the player gets
+
 let currentAttempt = 1;
 let secretCode = []; // to store the randomly generated secret code
 let totalScore = 0; // cumulative score across guesses in the current game
-let guessLocked = false; //flag to lock in guesses.
+// When true, the current guess row is finalised and cannot be edited.
+let guessLocked = false; // flag to lock in guesses
 
-// get the HTML elements, for attaching the event listeners
+// DOM element references
+// these are used to attach event listeners and update the UI.
 const symbolTypeSelect = document.getElementById('symbol-type');
 const difficultySlider = document.getElementById('difficultySlider');
 
@@ -68,10 +73,12 @@ const gameMessage = document.getElementById('game-message');
 const secretCodeLabel = document.getElementById('secret-code-label');
 const secretCodeDisplay = document.getElementById('secret-code-display');
 
+// gameActive flag to track if a game is in progress (true) or not (false)
 let gameActive = false;
 
 
-// Update button labels and enable/disable button states based on current game and selection status
+// Update button labels and enable/disable button states based on current game
+// and selection status so the player cannot perform invalid actions.
 function updateControlStates() {
     const typeRadios = document.querySelectorAll('input[name="typeRadio"]');
     const hasEnoughSelected = selectedSymbols.length >= MIN_SELECTED_SYMBOLS;
@@ -110,7 +117,8 @@ function updateScoreDisplay() {
     }
 }
 
-// attach event listener to difficulty level slider. 
+// attach event listener to difficulty level slider
+// Changing difficulty before a game starts resets the selected palette
 difficultySlider.addEventListener('input', function () {
     if (!gameActive) {
         selectedSymbols = [];
@@ -122,7 +130,7 @@ difficultySlider.addEventListener('input', function () {
 // **************************************************************************
 //                              SET UP THE GAME
 // **************************************************************************
-// return HTML DOM for the symbol pool based on the size of symbol array
+// Build a row of pool buttons from the current symbols array
 function fillPool() {
     const cellsHTML = symbols.map((item, index) => `
         <td class="pool-item">
@@ -136,8 +144,8 @@ function fillPool() {
 }
 
 
-// read the value of the radio buttons for game symbol set
-// and render/fill the symbols' pool
+// Listen to changes on the symbol type radio buttons and rebuild the pool
+// This also clears the selected symbols when no game is running
 function getGameSymbolType() {
     document.querySelectorAll('input[name="typeRadio"]').forEach(radio => {
         radio.addEventListener('change', function () {
@@ -171,7 +179,7 @@ function getGameSymbolType() {
 //                              SELECT THE PLAY SYMBOLS
 // **************************************************************************
 
-// create HTML DOM for the selected symbols based on the size of selectedSymbols array
+// Create DOM for the selected symbols based on selectedSymbols array
 // Re-render the whole row once so symbols "stack" instead of overriding
 function renderSelectedSet() {
     const cells = selectedSymbols.map((item, index) => `
@@ -185,12 +193,16 @@ function renderSelectedSet() {
     selectedPalette.innerHTML = `<tr>${cells}</tr>`;
 }
 
-// to manually pick symbols from symbols pool to selectedSymbols array
+// Allow the player to manually pick symbols from the pool into selectedSymbols.
 function pickSelected() {
+    // Default to the number symbol set the first time the pool is filled
+    // The active set will be updated when the user changes the radio button
     symbols = numberSet;
     const selectedPool = document.getElementById('pool-table');
     selectedPool.innerHTML = fillPool();
 
+    // Clicking a button inside the pool table appends that symbol
+    // to the selectedSymbols palette (unless a game is running).
     selectedPool.addEventListener('click', (event) => {
         if (gameActive) {
             return;
@@ -198,11 +210,11 @@ function pickSelected() {
         const btn = event.target.closest('button');
 
         // get the button id of the clicked button
-        // from all "pool-btn-x" buttons and render the selectedSymbols.
+        // from all "pool-btn-x" buttons and render the selectedSymbols
         if (btn && btn.id.startsWith('pool-btn-')) {
             const idParts = btn.id.split('-');
             const symbolIndex = parseInt(idParts[2]);
-            // if symbols is available push it to the seletedSymbols array and render.
+            // if symbols is available push it to the seletedSymbols array and render
             if (symbols[symbolIndex]) {
                 selectedSymbols.push(symbols[symbolIndex]);
                 renderSelectedSet();
@@ -214,6 +226,7 @@ function pickSelected() {
     // if Quick Pick btn is clicked, push symbols in symbols pool to selectedSymbols array
     // numberi of symbols to be pushed depending on the difficulty level
     // and render the selectedSymbols.
+    // Quick Pick fills selectedSymbols automatically based on difficulty
     quickPickBtn.addEventListener('click', function () {
         if (gameActive) {
             return;
@@ -228,7 +241,7 @@ function pickSelected() {
     });
 }
 
-// function to remove all symbols from the selectedSymbols.
+// Attach listener to remove all symbols from the selectedSymbols palette
 function removeAll() {
     removeAllBtn.addEventListener('click', function () {
         selectedPalette.innerHTML = "";
@@ -241,11 +254,11 @@ function removeAll() {
 //                              SUBMIT GUESSES
 // **************************************************************************
 
-// attach event listeners to all buttons on the selectedSymbols array.
+// Attach event listener to the Selected Symbols table itself
 const selectedSet = document.getElementById('selected-table');
 selectedSet.addEventListener('click', handleSelectedClick);
 
-// Handle clicks in the Selected Symbols table to build the current guess
+// handle clicks in the Selected Symbols table to build the current guess
 function handleSelectedClick(event) {
     if (!gameActive || guessLocked) {
         return;
@@ -255,7 +268,7 @@ function handleSelectedClick(event) {
         return;
     }
 
-    // push the clicked symbols to guessSymbols array and render
+    // Push the clicked symbol into guessedSymbols (up to CODE_LENGTH) and re-render.
     if (numberofGuessSymbols < CODE_LENGTH) {
         const symbolIndex = parseInt(btn.id.split('-')[2]);
         if (selectedSymbols[symbolIndex]) {
@@ -267,12 +280,12 @@ function handleSelectedClick(event) {
     }
 }
 
-// Render the current guessedSymbols into the appropriate guess row
+// Render the current guessedSymbols into the appropriate guess row.
 function renderGuessedSet(guessSequenceNumber) {
     const row = document.getElementById(`guess-${guessSequenceNumber}`);
     if (!row) return;
 
-    // Ensure the row has placeholder cells once
+    // Ensure the row has placeholder cells once.
     let cells = row.querySelectorAll('.guess-item');
     if (cells.length === 0) {
         let html = '';
@@ -283,12 +296,12 @@ function renderGuessedSet(guessSequenceNumber) {
         cells = row.querySelectorAll('.guess-item');
     }
 
-    // Clear all cells
+    // Clear all cells.
     cells.forEach(cell => {
         cell.textContent = '';
     });
 
-    // Fill cells with current guess symbols (up to CODE_LENGTH)
+    // Fill cells with current guess symbols (up to CODE_LENGTH).
     guessedSymbols.forEach((item, index) => {
         if (index < cells.length) {
             cells[index].textContent = item.symbol;
@@ -365,7 +378,7 @@ playBtn.addEventListener('click', function () {
     updateControlStates();
 });
 
-// Remove the last symbol from the current guess when Undo is clicked
+// Remove the last symbol from the current guess when Undo is clicked.
 function undoGuess() {
     undoGuessBtn.addEventListener('click', (event) => {
         // do nothing if guessLocked flag is true (guess has already been locked in)
@@ -382,7 +395,7 @@ function undoGuess() {
     });
 }
 
-// Finalise the current guess and trigger scoring when Submit btn is clicked
+// Finalise the current guess and calculate scoring when Submit btn is clicked.
 function submitGuess() {
     submitGuessBtn.addEventListener('click', (event) => {
         if (gameActive && numberofGuessSymbols === CODE_LENGTH && !guessLocked) {
@@ -399,14 +412,13 @@ function submitGuess() {
 
 /**
  * Fisher-Yates shuffle algorithm.
- * @param {Array} codeArray The array to shuffle (a shallow copy of selectedSymbols)
+ * @param {Array} codeArray The array to shuffle (a copy of selectedSymbols so not to change the original array)
  * @returns {Array} The shuffled codeArray.
  */
 function shuffleArray(codeArray) {
     let currentIndex = codeArray.length; 
     let randomIndex;
 
-    // While there remain elements to shuffle.
     while (currentIndex !== 0) {
         // Pick a remaining element.
         randomIndex = Math.floor(Math.random() * currentIndex);
@@ -418,7 +430,6 @@ function shuffleArray(codeArray) {
     }
     return codeArray;
 }
-
 
 // Build a random secret code of the requested length from the selectedSymbols pool
 function getRandomItems(codeLength) {
@@ -436,7 +447,8 @@ function getRandomItems(codeLength) {
 
 
 
-// Display ✔ with green or orange background colour for the given attempt based on the number of correct symbols and positions
+// Display ✔ with green or orange background colour for the given attempt
+// based on the number of correct symbols and positions.
 function renderResults(guessSequenceNumber, greenTick, orangeTick) {
     const row = document.getElementById(`result-${guessSequenceNumber}`);
     if (!row) return;
@@ -445,13 +457,13 @@ function renderResults(guessSequenceNumber, greenTick, orangeTick) {
     const totalCells = cells.length;
     let index;
 
-    //render x number of greenTick. Green background colour is set in CSS
+    // Render greenTick ✔ symbols first (correct symbol and correct position).
     for (index=0; index < greenTick && index < totalCells; index++) {
         const cell = cells[index];
         cell.textContent = '✔';
         cell.classList.add('results-green');
     }
-    //render x number of orangeTick. Orange background colour is set in CSS
+    // Then render orangeTick ✔ symbols (correct symbol, wrong position).
     for (let j = 0; j < orangeTick && index < totalCells; j++, index++) {
         const cell = cells[index];
         cell.textContent = '✔';
@@ -459,7 +471,8 @@ function renderResults(guessSequenceNumber, greenTick, orangeTick) {
     }
     
 }
-// Compare the current guess to the secret code, update ticks, and handle win/lose progression
+// Compare the current guess to the secret code, update ticks, and handle
+// scoring and win/lose progression for the current attempt.
 function checkResults() {
     if (!secretCode || secretCode.length === 0) {
         // if no secret code, then generate one
@@ -537,6 +550,7 @@ function checkResults() {
     updateControlStates();
 }
 
+// Main game play sequence
 document.addEventListener('DOMContentLoaded', () => {
     if (!gameActive) {
         getGameSymbolType();
