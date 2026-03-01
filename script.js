@@ -335,7 +335,7 @@ playBtn.addEventListener('click', function () {
             const resultRow = document.getElementById(`result-${attempt}`);
             if (resultRow) {
                 resultRow.querySelectorAll('.results').forEach(cell => {
-                    cell.classList.remove('results-green', 'results-grey');
+                    cell.classList.remove('results-green', 'results-orange');
                     cell.textContent = '';
                 });
             }
@@ -343,9 +343,24 @@ playBtn.addEventListener('click', function () {
         // render current guess.
         renderGuessedSet(currentAttempt);
     } else {
-        // Stop current game: keep last guesses/results visible but lock further changes
         gameActive = false;
         guessLocked = true;
+
+        for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+            const guessRow = document.getElementById(`guess-${attempt}`);
+            if (guessRow) {
+                guessRow.querySelectorAll('.guess-item').forEach(cell => {
+                    cell.textContent = '';
+                });
+            }
+            const resultRow = document.getElementById(`result-${attempt}`);
+            if (resultRow) {
+                resultRow.querySelectorAll('.results').forEach(cell => {
+                    cell.classList.remove('results-green', 'results-orange');
+                    cell.textContent = '';
+                });
+            }
+        }
     }
     updateControlStates();
 });
@@ -471,7 +486,7 @@ function checkResults() {
     }
 
     console.log("greenTick :", greenTick);
-    console.log("greyTick :", orangeTick);
+    console.log("orangeTick :", orangeTick);
 
     // Scoring: each green tick is worth 2 points, orange ticks are 0
     totalScore += greenTick * 2;
